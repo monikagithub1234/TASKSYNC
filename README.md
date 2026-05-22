@@ -1,5 +1,7 @@
 # 🚀 TaskSync - Collaborative Team Task Manager
 [live link-https://tasks-production-c829.up.railway.app/]
+
+---
 TaskSync is a modern, full-stack, high-fidelity collaborative task management application (similar to Trello or Asana). It empowers teams to create projects, invite members, assign tasks, and visualize team progress through responsive status board columns and dynamic metrics dashboard analytics.
 
 The application features a beautifully polished, **modern dark glassmorphism UI**, smooth CSS micro-animations, loading skeleton placeholders, robust JWT-based session protection, and strict role-based permission control.
