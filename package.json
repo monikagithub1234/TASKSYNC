@@ -1,0 +1,29 @@
+{
+  "name": "team-task-management",
+  "version": "1.0.0",
+  "description": "Full-stack Team Task Management Web Application",
+  "main": "backend/server.js",
+  "scripts": {
+    "install-all": "npm install && npm install --prefix backend && npm install --prefix frontend",
+    "backend": "node backend/server.js",
+    "backend-dev": "node --watch backend/server.js",
+    "frontend": "npm run dev --prefix frontend",
+    "dev": "concurrently \"npm run backend-dev\" \"npm run frontend\"",
+    "build": "npm install --prefix backend && npm install --prefix frontend && npm run build --prefix frontend",
+    "start": "node backend/server.js"
+  },
+  "keywords": [
+    "task-manager",
+    "trello",
+    "asana",
+    "react",
+    "node",
+    "express",
+    "sequelize"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

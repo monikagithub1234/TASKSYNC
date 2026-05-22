@@ -1,5 +1,3 @@
-# TASKSYNC
-
 # 🚀 TaskSync - Collaborative Team Task Manager
 
 TaskSync is a modern, full-stack, high-fidelity collaborative task management application (similar to Trello or Asana). It empowers teams to create projects, invite members, assign tasks, and visualize team progress through responsive status board columns and dynamic metrics dashboard analytics.
@@ -164,3 +162,49 @@ To keep testing seamless, the application **automatically seeds itself** with hi
 - **Permissions**: Member. Can only update his own tasks.
 
 ---
+
+## 🚂 Railway Deployment Guide (100% Automatic!)
+
+TaskSync is optimized to compile and deploy on **Railway** in one step. It uses a single container port, preventing CORS errors and avoiding multiple bills!
+
+### Step 1: Prepare Code
+1. Push your repository to **GitHub**.
+
+### Step 2: Deploy on Railway
+1. Log in to [Railway.app](https://railway.app/).
+2. Click **New Project** -> **Deploy from GitHub repository** -> select your repo.
+3. Railway will automatically detect the root `package.json` scripts. Our `"build"` script is engineered to install backend and frontend packages and compile Vite static files automatically:
+   ```json
+   "build": "npm install --prefix backend && npm install --prefix frontend && npm run build --prefix frontend"
+   ```
+4. Railway will then execute `"start": "node backend/server.js"` which boots up the Express API server and serves the compiled React assets statically.
+
+### Step 3: Add Variables
+Inside your Railway service settings, add these Environment Variables:
+- `NODE_ENV` = `production`
+- `JWT_SECRET` = `choose-a-strong-random-key`
+- **Database Connection**: Create a **PostgreSQL** database service in your Railway project, then link it to your Node service. Railway will automatically inject the `DATABASE_URL` variable, which transitions TaskSync from SQLite to PostgreSQL instantly!
+
+---
+
+## 🗣️ Technical Interview Q&A Guide
+
+### Q1: How did you implement database compatibility between Local SQLite and Production Postgres?
+> **Answer**: "I leveraged **Sequelize ORM** which abstracts database dialects behind standard JavaScript model schemas. In my database manager `db.js`, I check if the environment variable `DATABASE_URL` is set. If present (e.g. on Railway), Sequelize instantiates a connection to PostgreSQL, enabling secure SSL communication parameters. If not, it falls back to a local `database.sqlite` file. This dynamic setup provides a clean, zero-configuration local setup for developers while deploying robustly in enterprise-grade production environments."
+
+### Q2: How is security and Role-Based Access Control (RBAC) enforced on the backend?
+> **Answer**: "I designed two custom middleware layers in Express. 
+> 
+> First, `authMiddleware.js` decodes the incoming `Authorization` Bearer JWT token, validates the user signature against our `JWT_SECRET`, and attaches the authenticated `req.user` context.
+> 
+> Second, `roleMiddleware.js` verifies project permissions. It dynamically resolves the target `projectId` (from URL parameters, the request body, queries, or by fetching the parent project of a requested `taskId`). It queries the bridge table `ProjectMember` to extract the user's role (Admin or Member) and appends it to the request as `req.projectRole`.
+> 
+> If a Member attempts to modify an unauthorized task field or access another user's task, the controller blocks the request with a `403 Forbidden` status."
+
+### Q3: How did you handle the frontend architecture and page transitions without heavy routers?
+> **Answer**: "I built a highly stable, lightweight **state-based router** in React context. We track the active view in state, rendering the `Login` or `Register` cards conditionally if the user is unauthenticated. This creates mathematical view protection: if the token is absent or invalid, protected pages are never rendered. This architecture is immune to client-side routing bugs, works instantly on any static file host without special redirect setups, and remains extremely easy to explain, debug, and maintain."
+
+### Q4: Why did you bundle the React frontend and Express backend into a single service?
+> **Answer**: "Bundling the React build inside the Express server's public asset path using `express.static` solves two major production hurdles. 
+> First, it **eliminates CORS configuration issues** entirely because the client and the API share the exact same host and port. 
+> Second, it **halves hosting costs** and setup steps, allowing the entire application to build and run inside a single container process on Railway."
